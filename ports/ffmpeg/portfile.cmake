@@ -11,7 +11,6 @@ vcpkg_from_github(
         0005-fix-libvpx-linking.patch
         0006-fix-StaticFeatures.patch
         0007-fix-lib-naming.patch
-        0008-Fix-wavpack-detection.patch
         0009-Fix-fdk-detection.patch
         0010-Fix-x264-detection.patch
         0011-Fix-x265-detection.patch
@@ -299,14 +298,6 @@ if("vpx" IN_LIST FEATURES)
     set(ENABLE_VPX ${STATIC_LINKAGE})
 else()
     set(OPTIONS "${OPTIONS} --disable-libvpx")
-endif()
-
-set(ENABLE_WAVPACK OFF)
-if("wavpack" IN_LIST FEATURES)
-    set(OPTIONS "${OPTIONS} --enable-libwavpack")
-    set(ENABLE_WAVPACK ${STATIC_LINKAGE})
-else()
-    set(OPTIONS "${OPTIONS} --disable-libwavpack")
 endif()
 
 set(ENABLE_X264 OFF)
