@@ -1,5 +1,5 @@
 Source: ffmpeg
-Version: 2020-10-25
+Version: 2020-10-26
 Port-Version: 0
 Homepage: https://ffmpeg.org
 Description: a library to decode, encode, transcode, mux, demux, stream, filter and play pretty much anything that humans and machines have created.
