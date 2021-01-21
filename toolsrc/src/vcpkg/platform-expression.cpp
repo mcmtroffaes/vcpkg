@@ -29,6 +29,7 @@ namespace vcpkg::PlatformExpression
         uwp,
         android,
         emscripten,
+        ios,
 
         static_link,
     };
@@ -48,6 +49,7 @@ namespace vcpkg::PlatformExpression
             {"uwp", Identifier::uwp},
             {"android", Identifier::android},
             {"emscripten", Identifier::emscripten},
+            {"ios", Identifier::ios},
             {"static", Identifier::static_link},
         };
 
@@ -392,14 +394,11 @@ namespace vcpkg::PlatformExpression
                         case Identifier::android: return true_if_exists_and_equal("VCPKG_CMAKE_SYSTEM_NAME", "Android");
                         case Identifier::emscripten:
                             return true_if_exists_and_equal("VCPKG_CMAKE_SYSTEM_NAME", "Emscripten");
+                        case Identifier::ios: return true_if_exists_and_equal("VCPKG_CMAKE_SYSTEM_NAME", "iOS");
                         case Identifier::wasm32: return true_if_exists_and_equal("VCPKG_TARGET_ARCHITECTURE", "wasm32");
                         case Identifier::static_link:
                             return true_if_exists_and_equal("VCPKG_LIBRARY_LINKAGE", "static");
-                        default:
-                            Checks::exit_with_message(
-                                VCPKG_LINE_INFO,
-                                "vcpkg bug: string2identifier returned a value that we don't recognize: %d\n",
-                                static_cast<int>(id));
+                        default: Checks::unreachable(VCPKG_LINE_INFO);
                     }
                 }
                 else if (expr.kind == ExprKind::op_not)
