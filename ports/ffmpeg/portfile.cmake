@@ -17,6 +17,7 @@ vcpkg_from_github(
         0012-Fix-ssl-110-detection.patch
         0013-define-WINVER.patch
         0014-avfilter-dependency-fix.patch
+        0015-Patch-for-ticket-9019-CUDA-Compile-Broken-Using-MSVC.patch
 )
 
 if (SOURCE_PATH MATCHES " ")
