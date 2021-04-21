@@ -374,6 +374,12 @@ if(APPLE)
   endif()
 endif()
 
+if(UNIX AND NOT APPLE)
+  if(@ENABLE_AVDEVICE@)
+    list(APPEND FFMPEG_PLATFORM_DEPENDENT_LIBS -lxcb)
+  endif()
+endif()
+
 if(@ENABLE_AVDEVICE@)
   FFMPEG_FIND(libavdevice   avdevice   avdevice.h)
 endif()
