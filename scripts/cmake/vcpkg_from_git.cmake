@@ -84,22 +84,22 @@ function(vcpkg_from_git)
     # Note: git init is safe to run multiple times
     vcpkg_execute_required_process(
       ALLOW_IN_DOWNLOAD_MODE
-      COMMAND ${GIT} init git-tmp
-      WORKING_DIRECTORY ${DOWNLOADS}
+      COMMAND "${GIT}" init git-tmp
+      WORKING_DIRECTORY "${DOWNLOADS}"
       LOGNAME git-init-${TARGET_TRIPLET}
     )
     vcpkg_execute_required_process(
       ALLOW_IN_DOWNLOAD_MODE
-      COMMAND ${GIT} fetch ${_vdud_URL} ${_vdud_TAG} --depth 1 -n
-      WORKING_DIRECTORY ${DOWNLOADS}/git-tmp
+      COMMAND "${GIT}" fetch ${_vdud_URL} ${_vdud_TAG} --depth 1 -n
+      WORKING_DIRECTORY "${DOWNLOADS}/git-tmp"
       LOGNAME git-fetch-${TARGET_TRIPLET}
     )
     vcpkg_execute_in_download_mode(
-      COMMAND ${GIT} rev-parse FETCH_HEAD
+      COMMAND "${GIT}" rev-parse FETCH_HEAD
       OUTPUT_VARIABLE REV_PARSE_HEAD
       ERROR_VARIABLE REV_PARSE_HEAD
       RESULT_VARIABLE error_code
-      WORKING_DIRECTORY ${DOWNLOADS}/git-tmp
+      WORKING_DIRECTORY "${DOWNLOADS}/git-tmp"
     )
     if(error_code)
         message(FATAL_ERROR "unable to determine FETCH_HEAD after fetching git repository")
