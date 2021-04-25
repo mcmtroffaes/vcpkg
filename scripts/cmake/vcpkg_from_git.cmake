@@ -117,8 +117,8 @@ function(vcpkg_from_git)
     file(MAKE_DIRECTORY "${DOWNLOADS}/temp")
     vcpkg_execute_required_process(
       ALLOW_IN_DOWNLOAD_MODE
-      COMMAND "${GIT}" archive FETCH_HEAD -o "${TEMP_ARCHIVE}"
-      WORKING_DIRECTORY "${DOWNLOADS}/git-tmp"
+      COMMAND ${GIT} archive FETCH_HEAD -o "${TEMP_ARCHIVE}"
+      WORKING_DIRECTORY ${DOWNLOADS}/git-tmp
       LOGNAME git-archive
     )
 
