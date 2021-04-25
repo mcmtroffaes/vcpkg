@@ -77,6 +77,10 @@ Halting portfile execution.
 ]])
     endif()
 
+    foreach(_item ${vcpkg_execute_required_process_COMMAND})
+        message(STATUS "XXX vcpkg_execute_required_process command: ${_item}")
+    endforeach()
+
     vcpkg_execute_in_download_mode(
         COMMAND ${vcpkg_execute_required_process_COMMAND}
         OUTPUT_FILE ${LOG_OUT}
