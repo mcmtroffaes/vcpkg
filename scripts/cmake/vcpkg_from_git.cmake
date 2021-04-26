@@ -81,12 +81,6 @@ function(vcpkg_from_git)
     endif()
     message(STATUS "Fetching ${_vdud_URL}...")
     find_program(GIT NAMES git git.cmd)
-    message(STATUS "XXX found git at ${GIT}")
-    if(EXISTS ${GIT})
-      message(STATUS "XXX exists ${GIT}")
-    else()
-      message(STATUS "XXX not exists ${GIT}")
-    endif()
     # Note: git init is safe to run multiple times
     vcpkg_execute_required_process(
       ALLOW_IN_DOWNLOAD_MODE

@@ -52,10 +52,6 @@ function(vcpkg_execute_in_download_mode)
         endif()
     endforeach()
 
-    foreach(_item ${vcpkg_execute_in_download_mode_COMMAND})
-        message(STATUS "XXX vcpkg_execute_in_download_mode command: ${_item}")
-    endforeach()
-
     if (DEFINED VCPKG_DOWNLOAD_MODE)
         _execute_process(COMMAND ${vcpkg_execute_in_download_mode_COMMAND} ${other_args})
     else()
