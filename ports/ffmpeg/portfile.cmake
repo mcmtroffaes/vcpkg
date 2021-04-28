@@ -185,12 +185,6 @@ else()
     set(ENABLE_SWSCALE OFF)
 endif()
 
-set(ENABLE_AVRESAMPLE OFF)
-if("avresample" IN_LIST FEATURES)
-    set(OPTIONS "${OPTIONS} --enable-avresample")
-    set(ENABLE_AVRESAMPLE ON)
-endif()
-
 set(STATIC_LINKAGE OFF)
 if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
     set(STATIC_LINKAGE ON)
@@ -733,8 +727,6 @@ extract_version_from_component(LIBAVFILTER_VERSION
     COMPONENT libavfilter)
 extract_version_from_component( LIBAVFORMAT_VERSION
     COMPONENT libavformat)
-extract_version_from_component(LIBAVRESAMPLE_VERSION
-    COMPONENT libavresample)
 extract_version_from_component(LIBSWRESAMPLE_VERSION
     COMPONENT libswresample)
 extract_version_from_component(LIBSWSCALE_VERSION
