@@ -1,8 +1,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO ffmpeg/ffmpeg
-    REF 3a3e8c35b63a40c4d59161097dc8652c15d13779
-    SHA512 92daa96f3fa1df5c7f43e000b27004b6af37b5d4faea29632ebe53119e31e8ff98658e0bee777caf285877fd7e9fe67e436aab60973fc6a035e5b14e6c1b1804
+    REF e27e80edcd3a20efb8520943448aa9353a191ecd
+    SHA512 60ebe7a2336977112ef034dbfee4ad21f3b9e3e957de7f963748623de4fdce505882b6797bd4acd4a5be60cc87a0e393be9e1a20c0b809588de2bc9bf5e1c2c8
     HEAD_REF master
     PATCHES
         0001-create-lib-libraries.patch
