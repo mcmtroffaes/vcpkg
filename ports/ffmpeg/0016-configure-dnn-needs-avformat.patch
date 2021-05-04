@@ -6,18 +6,19 @@ Subject: [PATCH] configure: dnn needs avformat
 The source file "libavfilter/dnn/dnn_backend_native.h" includes
 "libavformat/avio.h", so avformat needs to be declared as a dependency.
 ---
- configure | 1 +
- 1 file changed, 1 insertion(+)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index 36713ab658..84f7980dc2 100755
+index 9e45c0822c..8725a94f8a 100755
 --- a/configure
 +++ b/configure
-@@ -2621,6 +2621,7 @@ cbs_vp9_select="cbs"
+@@ -2660,7 +2660,7 @@ cbs_vp9_select="cbs"
  dct_select="rdft"
  dirac_parse_select="golomb"
- dnn_suggest="libtensorflow"
-+dnn_deps="avformat"
+ dnn_suggest="libtensorflow libopenvino"
+-dnn_deps="swscale"
++dnn_deps="avformat swscale"
  error_resilience_select="me_cmp"
  faandct_deps="faan"
  faandct_select="fdctdsp"
