@@ -688,6 +688,59 @@ endif()
 
 vcpkg_fixup_pkgconfig()
 
+# Handle dependencies
+
+function(append_dependencies_from_config_mak out)
+    cmake_parse_arguments(PARSE_ARGV 1 "arg" "" "FILE;CONFIG_VARIABLE" "")
+    file(STRINGS "${arg_FILE}" contents REGEX "^${arg_CONFIG_VARIABLE}=.*" LIMIT_COUNT 1)
+    message(STATUS "${arg_CONFIG_VARIABLE} 1")
+    message("${contents}")
+    string(REGEX REPLACE "^${arg_VARIABLE}=" "" contents ${contents})
+    message(STATUS "${arg_CONFIG_VARIABLE} 2")
+    message("${contents}")
+    string(REGEX REPLACE "-libpath:[^ ]+" "" contents ${contents})
+    message(STATUS "${arg_CONFIG_VARIABLE} 3")
+    message("${contents}")
+    string(REGEX REPLACE "[ ]+" ";" contents ${contents})
+    message(STATUS "${arg_CONFIG_VARIABLE} 4")
+    message("${contents}")
+    list(APPEND "${out}" "${contents}" PARENT_SCOPE)
+    set("${out}" "${out}" PARENT_SCOPE)
+endfunction()
+
+set(config_variables "EXTRALIBS;HOSTEXTRALIBS")
+if("avresample" IN_LIST FEATURES)
+    list(APPEND config_variables "EXTRALIBS-avresample")
+endif()
+
+foreach(config_variable
+        "EXTRALIBS-avresample"
+        "EXTRALIBS-swscale"
+        "EXTRALIBS-swresample"
+        "EXTRALIBS-postproc"
+        "EXTRALIBS-avdevice"
+        "EXTRALIBS-avformat"
+        "EXTRALIBS-avfilter"
+        "EXTRALIBS-avcodec"
+        "EXTRALIBS-avutil"
+        "EXTRALIBS"
+        "HOSTEXTRALIBS")
+    if(NOT VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL release)
+        append_dependencies_from_config_mak(FFMPEG_DEPENDENCIES_RELEASE
+            FILE "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/ffbuild/config.mak"
+            CONFIG_VARIABLE "${config_variable}"
+        )
+    endif()
+    if(NOT VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL debug)
+        append_dependencies_from_config_mak(FFMPEG_DEPENDENCIES_DEBUG
+            FILE "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg/ffbuild/config.mak"
+            CONFIG_VARIABLE "${config_variable}"
+        )
+    endif()
+endforeach()
+
+message(FATAL_ERROR "test done")
+
 # Handle version strings
 
 function(extract_regex_from_file out)
