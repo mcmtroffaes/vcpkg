@@ -694,8 +694,8 @@ function(append_dependencies_from_config_mak out)
     cmake_parse_arguments(PARSE_ARGV 1 "arg" "" "FILE;CONFIG_VARIABLE" "")
     file(STRINGS "${arg_FILE}" contents REGEX "^${arg_CONFIG_VARIABLE}=.*" LIMIT_COUNT 1)
     string(REGEX REPLACE "^${arg_CONFIG_VARIABLE}=" "" contents "${contents}")
-    string(REGEX REPLACE "-libpath:[^ ]+" "" contents "${contents}")
     string(REGEX REPLACE "[ ]+" ";" contents "${contents}")
+    list(FILTER contents EXCLUDE REGEX "^-libpath:.+")
     if(contents)
         list(APPEND "${out}" "${contents}")
         set("${out}" "${${out}}" PARENT_SCOPE)
@@ -716,7 +716,7 @@ feature_list("avdevice"   APPEND config_variables "EXTRALIBS-avdevice")
 feature_list("avformat"   APPEND config_variables "EXTRALIBS-avformat")
 feature_list("avfilter"   APPEND config_variables "EXTRALIBS-avfilter")
 feature_list("avcodec"    APPEND config_variables "EXTRALIBS-avcodec")
-list(APPEND config_variables "EXTRALIBS;HOSTEXTRALIBS;EXTRALIBS-avutil")
+list(APPEND config_variables "EXTRALIBS-avutil;EXTRALIBS")
 
 foreach(config_variable ${config_variables})
     if(NOT VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL release)
@@ -735,9 +735,44 @@ endforeach()
 
 list(REMOVE_DUPLICATES FFMPEG_DEPENDENCIES_RELEASE)
 list(REMOVE_DUPLICATES FFMPEG_DEPENDENCIES_DEBUG)
+set(SYSTEM_LIBRARIES
+    advapi32.lib
+    bcrypt.lib
+    mfplat.lib
+    mfuuid.lib
+    ole32.lib
+    psapi.lib
+    secur32.lib
+    shell32.lib
+    strmiids.lib
+    user32.lib
+    vfw32.lib
+    ws2_32.lib
+)
 
-message(STATUS "FFMPEG_DEPENDENCIES_RELEASE ${FFMPEG_DEPENDENCIES_RELEASE}")
-message(STATUS "FFMPEG_DEPENDENCIES_DEBUG   ${FFMPEG_DEPENDENCIES_DEBUG}")
+foreach(lib ${FFMPEG_DEPENDENCIES_RELEASE})
+    if("${lib}" IN_LIST SYSTEM_LIBRARIES)
+        list(APPEND FFMPEG_DEPENDENCIES optimized "${lib}")
+    else()
+        if(NOT EXISTS "${CURRENT_INSTALLED_DIR}/lib/${lib}")
+            message(FATAL_ERROR "dependency ${lib} not found")
+        endif()
+        list(APPEND FFMPEG_DEPENDENCIES optimized "${CURRENT_INSTALLED_DIR}/lib/${lib}")
+    endif()
+endforeach()
+
+foreach(lib ${FFMPEG_DEPENDENCIES_DEBUG})
+    if("${lib}" IN_LIST SYSTEM_LIBRARIES)
+        list(APPEND FFMPEG_DEPENDENCIES debug "${lib}")
+    else()
+        if(NOT EXISTS "${CURRENT_INSTALLED_DIR}/debug/lib/${lib}")
+            message(FATAL_ERROR "dependency ${lib} not found")
+        endif()
+        list(APPEND FFMPEG_DEPENDENCIES optimized "${CURRENT_INSTALLED_DIR}/debug/lib/${lib}")
+    endif()
+endforeach()
+
+message(STATUS "FFMPEG_DEPENDENCIES ${FFMPEG_DEPENDENCIES}")
 
 # Handle version strings
 
