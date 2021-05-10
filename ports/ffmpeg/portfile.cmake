@@ -693,38 +693,32 @@ vcpkg_fixup_pkgconfig()
 function(append_dependencies_from_config_mak out)
     cmake_parse_arguments(PARSE_ARGV 1 "arg" "" "FILE;CONFIG_VARIABLE" "")
     file(STRINGS "${arg_FILE}" contents REGEX "^${arg_CONFIG_VARIABLE}=.*" LIMIT_COUNT 1)
-    message(STATUS "${arg_CONFIG_VARIABLE} 1")
-    message("${contents}")
-    string(REGEX REPLACE "^${arg_VARIABLE}=" "" contents ${contents})
-    message(STATUS "${arg_CONFIG_VARIABLE} 2")
-    message("${contents}")
-    string(REGEX REPLACE "-libpath:[^ ]+" "" contents ${contents})
-    message(STATUS "${arg_CONFIG_VARIABLE} 3")
-    message("${contents}")
-    string(REGEX REPLACE "[ ]+" ";" contents ${contents})
-    message(STATUS "${arg_CONFIG_VARIABLE} 4")
-    message("${contents}")
-    list(APPEND "${out}" "${contents}" PARENT_SCOPE)
-    set("${out}" "${out}" PARENT_SCOPE)
+    string(REGEX REPLACE "^${arg_CONFIG_VARIABLE}=" "" contents "${contents}")
+    string(REGEX REPLACE "-libpath:[^ ]+" "" contents "${contents}")
+    string(REGEX REPLACE "[ ]+" ";" contents "${contents}")
+    if(contents)
+        list(APPEND "${out}" "${contents}")
+        set("${out}" "${${out}}" PARENT_SCOPE)
+    endif()
 endfunction()
 
-set(config_variables "EXTRALIBS;HOSTEXTRALIBS")
-if("avresample" IN_LIST FEATURES)
-    list(APPEND config_variables "EXTRALIBS-avresample")
-endif()
+macro(feature_list feature)
+    if(${feature} IN_LIST FEATURES)
+        list(${ARGN})
+    endif()
+endmacro()
 
-foreach(config_variable
-        "EXTRALIBS-avresample"
-        "EXTRALIBS-swscale"
-        "EXTRALIBS-swresample"
-        "EXTRALIBS-postproc"
-        "EXTRALIBS-avdevice"
-        "EXTRALIBS-avformat"
-        "EXTRALIBS-avfilter"
-        "EXTRALIBS-avcodec"
-        "EXTRALIBS-avutil"
-        "EXTRALIBS"
-        "HOSTEXTRALIBS")
+feature_list("avresample" APPEND config_variables "EXTRALIBS-avresample")
+feature_list("swscale"    APPEND config_variables "EXTRALIBS-swscale")
+feature_list("swresample" APPEND config_variables "EXTRALIBS-swresample")
+feature_list("postproc"   APPEND config_variables "EXTRALIBS-postproc")
+feature_list("avdevice"   APPEND config_variables "EXTRALIBS-avdevice")
+feature_list("avformat"   APPEND config_variables "EXTRALIBS-avformat")
+feature_list("avfilter"   APPEND config_variables "EXTRALIBS-avfilter")
+feature_list("avcodec"    APPEND config_variables "EXTRALIBS-avcodec")
+list(APPEND config_variables "EXTRALIBS;HOSTEXTRALIBS;EXTRALIBS-avutil")
+
+foreach(config_variable ${config_variables})
     if(NOT VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL release)
         append_dependencies_from_config_mak(FFMPEG_DEPENDENCIES_RELEASE
             FILE "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/ffbuild/config.mak"
@@ -739,7 +733,11 @@ foreach(config_variable
     endif()
 endforeach()
 
-message(FATAL_ERROR "test done")
+list(REMOVE_DUPLICATES FFMPEG_DEPENDENCIES_RELEASE)
+list(REMOVE_DUPLICATES FFMPEG_DEPENDENCIES_DEBUG)
+
+message(STATUS "FFMPEG_DEPENDENCIES_RELEASE ${FFMPEG_DEPENDENCIES_RELEASE}")
+message(STATUS "FFMPEG_DEPENDENCIES_DEBUG   ${FFMPEG_DEPENDENCIES_DEBUG}")
 
 # Handle version strings
 
