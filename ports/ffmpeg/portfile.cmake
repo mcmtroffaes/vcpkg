@@ -695,7 +695,15 @@ function(append_dependencies_from_config_mak out)
     file(STRINGS "${arg_FILE}" contents REGEX "^${arg_CONFIG_VARIABLE}=.*" LIMIT_COUNT 1)
     string(REGEX REPLACE "^${arg_CONFIG_VARIABLE}=" "" contents "${contents}")
     string(REGEX REPLACE "[ ]+" ";" contents "${contents}")
-    list(FILTER contents EXCLUDE REGEX "^-libpath:.+")
+    if(VCPKG_TARGET_IS_LINUX)
+        list(FILTER contents EXCLUDE REGEX "^-L.+")
+        list(TRANSFORM contents REPLACE "^-l" "")
+    endif()
+    if(VCPKG_TARGET_IS_WINDOWS)
+        list(TRANSFORM contents TOLOWER)
+        list(FILTER contents EXCLUDE REGEX "^-libpath:.+")
+        list(TRANSFORM contents REPLACE ".lib$" "")
+    endif()
     if(contents)
         list(APPEND "${out}" "${contents}")
         set("${out}" "${${out}}" PARENT_SCOPE)
@@ -708,6 +716,7 @@ macro(feature_list feature)
     endif()
 endmacro()
 
+# note: library order matters on linux, so dependent libraries first
 feature_list("avresample" APPEND config_variables "EXTRALIBS-avresample")
 feature_list("swscale"    APPEND config_variables "EXTRALIBS-swscale")
 feature_list("swresample" APPEND config_variables "EXTRALIBS-swresample")
@@ -735,44 +744,46 @@ endforeach()
 
 list(REMOVE_DUPLICATES FFMPEG_DEPENDENCIES_RELEASE)
 list(REMOVE_DUPLICATES FFMPEG_DEPENDENCIES_DEBUG)
-set(SYSTEM_LIBRARIES
-    advapi32.lib
-    bcrypt.lib
-    mfplat.lib
-    mfuuid.lib
-    ole32.lib
-    psapi.lib
-    secur32.lib
-    shell32.lib
-    strmiids.lib
-    user32.lib
-    vfw32.lib
-    ws2_32.lib
-)
+set(SYSTEM_LIBRARIES ${VCPKG_SYSTEM_LIBRARIES})
+if(VCPKG_TARGET_IS_WINDOWS)
+   list(APPEND SYSTEM_LIBRARIES mfplat)
+   list(APPEND SYSTEM_LIBRARIES mfuuid)
+endif()
+if(VCPKG_TARGET_IS_LINUX)
+   list(APPEND SYSTEM_LIBRARIES -pthread)
+   list(APPEND SYSTEM_LIBRARIES stdc++)
+   list(APPEND SYSTEM_LIBRARIES va-drm)
+   list(APPEND SYSTEM_LIBRARIES va)
+   list(APPEND SYSTEM_LIBRARIES vdpau)
+   list(APPEND SYSTEM_LIBRARIES xcb)
+   list(APPEND SYSTEM_LIBRARIES xcb-shm)
+   list(APPEND SYSTEM_LIBRARIES xcb-shape)
+   list(APPEND SYSTEM_LIBRARIES xcb-xfixes)
+   list(APPEND SYSTEM_LIBRARIES X11)
+   list(APPEND SYSTEM_LIBRARIES Xau)
+   list(APPEND SYSTEM_LIBRARIES Xext)
+   list(APPEND SYSTEM_LIBRARIES Xv)
+endif()
 
-foreach(lib ${FFMPEG_DEPENDENCIES_RELEASE})
-    if("${lib}" IN_LIST SYSTEM_LIBRARIES)
-        list(APPEND FFMPEG_DEPENDENCIES optimized "${lib}")
+foreach(lib_name ${FFMPEG_DEPENDENCIES_RELEASE})
+    if("${lib_name}" IN_LIST SYSTEM_LIBRARIES)
+        list(APPEND FFMPEG_DEPENDENCIES optimized "${lib_name}")
     else()
-        if(NOT EXISTS "${CURRENT_INSTALLED_DIR}/lib/${lib}")
-            message(FATAL_ERROR "dependency ${lib} not found")
-        endif()
-        list(APPEND FFMPEG_DEPENDENCIES optimized "${CURRENT_INSTALLED_DIR}/lib/${lib}")
+        find_library(FFMPEG_DEPENDENCY_${lib_name}_RELEASE NAMES "${lib_name}" PATHS "${CURRENT_INSTALLED_DIR}/lib/" NO_DEFAULT_PATH REQUIRED)
+        list(APPEND FFMPEG_DEPENDENCIES optimized "${FFMPEG_DEPENDENCY_${lib_name}_RELEASE}")
     endif()
 endforeach()
 
-foreach(lib ${FFMPEG_DEPENDENCIES_DEBUG})
-    if("${lib}" IN_LIST SYSTEM_LIBRARIES)
-        list(APPEND FFMPEG_DEPENDENCIES debug "${lib}")
+foreach(lib_name ${FFMPEG_DEPENDENCIES_DEBUG})
+    if("${lib_name}" IN_LIST SYSTEM_LIBRARIES)
+        list(APPEND FFMPEG_DEPENDENCIES debug "${lib_name}")
     else()
-        if(NOT EXISTS "${CURRENT_INSTALLED_DIR}/debug/lib/${lib}")
-            message(FATAL_ERROR "dependency ${lib} not found")
-        endif()
-        list(APPEND FFMPEG_DEPENDENCIES optimized "${CURRENT_INSTALLED_DIR}/debug/lib/${lib}")
+        find_library(FFMPEG_DEPENDENCY_${lib_name}_DEBUG NAMES "${lib_name}" PATHS "${CURRENT_INSTALLED_DIR}/debug/lib/" NO_DEFAULT_PATH REQUIRED)
+        list(APPEND FFMPEG_DEPENDENCIES debug "${FFMPEG_DEPENDENCY_${lib_name}_DEBUG}")
     endif()
 endforeach()
 
-message(STATUS "FFMPEG_DEPENDENCIES ${FFMPEG_DEPENDENCIES}")
+message(STATUS "Dependencies: ${FFMPEG_DEPENDENCIES}")
 
 # Handle version strings
 
