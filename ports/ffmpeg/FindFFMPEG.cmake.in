@@ -42,7 +42,7 @@ endif()
 set(FFMPEG_VERSION "@FFMPEG_VERSION@")
 
 function(append_dependencies out)
-    cmake_parse_arguments(PARSE_ARGV 1 "arg" "DEBUG" "" "NAMES")
+    cmake_parse_arguments(PARSE_ARGV 1 "arg" "DEBUG" "NAMES" "")
     if(${arg_DEBUG})
         set(config DEBUG)
         set(path "${CURRENT_INSTALLED_DIR}/debug/lib/")
@@ -132,6 +132,9 @@ if (FFMPEG_libavutil_FOUND)
     set(FFMPEG_libswscale_VERSION "@LIBSWSCALE_VERSION@" CACHE STRING "")
   endif()
 
+  if(UNIX)
+    list(APPEND FFMPEG_LIBRARIES -pthread)
+  endif()
   append_dependencies(FFMPEG_LIBRARIES NAMES "@FFMPEG_DEPENDENCIES_RELEASE@")
   append_dependencies(FFMPEG_LIBRARIES NAMES "@FFMPEG_DEPENDENCIES_DEBUG@" DEBUG)
 
