@@ -58,7 +58,10 @@ function(append_dependencies out)
         elseif("${lib_name}" STREQUAL "stdc++")
             list(APPEND ${out} ${variant} "-lstdc++")
         else()
-            find_library(FFMPEG_DEPENDENCY_${lib_name}_${config} NAMES "${lib_name}" PATHS "${path}" REQUIRED)
+            # first look in ${path} specifically to ensure we find the right release/debug variant
+            find_library(FFMPEG_DEPENDENCY_${lib_name}_${config} NAMES "${lib_name}" PATHS "${path}" NO_DEFAULT_PATH)
+            # if not found there, must be a system dependency, so look elsewhere
+            find_library(FFMPEG_DEPENDENCY_${lib_name}_${config} NAMES "${lib_name}" REQUIRED)
             list(APPEND ${out} ${variant} "${FFMPEG_DEPENDENCY_${lib_name}_${config}}")
         endif()
     endforeach()
