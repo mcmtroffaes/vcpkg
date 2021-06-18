@@ -6,6 +6,8 @@ vcpkg_from_github(
     REF v3.7.0
     SHA512 0f2d5344c4472b810667b99d9e99a2ec8135923f4185dbd7e29ca65e696ce13500ea20ef09c995486573314149a671e1256a4dd0696c4ace8d3ec3716ffdcfc7
     HEAD_REF master
+    PATCHES
+        0001-fix-syslibs.patch
 )
 
 vcpkg_download_distfile(GHC_ARCHIVE
