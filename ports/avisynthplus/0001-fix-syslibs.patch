@@ -1,5 +1,5 @@
 diff --git a/avs_core/CMakeLists.txt b/avs_core/CMakeLists.txt
-index 76e61caa..7c4aa945 100644
+index 76e61caa..51f5dcd3 100644
 --- a/avs_core/CMakeLists.txt
 +++ b/avs_core/CMakeLists.txt
 @@ -97,26 +97,26 @@ if (EXISTS ${GHS_FILESYSTEM_INCLUDE_DIR})
@@ -34,7 +34,7 @@ index 76e61caa..7c4aa945 100644
 +        list(APPEND SYSLIB "stdc++fs")
 +    endif()
 +elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-+    list(APPEND SYSLIBFLAGS "-stdlib=stdc++")
++    list(APPEND SYSLIBFLAGS "-stdlib=libc++")
  endif()
  
 +target_link_libraries("AvsCore" ${SYSLIB})
