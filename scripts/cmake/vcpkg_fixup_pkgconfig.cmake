@@ -162,18 +162,14 @@ function(vcpkg_fixup_pkgconfig)
             # Once this transformation is complete, users of vcpkg should never need to pass
             # --static.
             if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
-                # Libs comes before Libs.private
-                string(REGEX REPLACE "(^|\n)(Libs: *[^\n]*)(.*)\nLibs.private:( *[^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
-                # Libs.private comes before Libs
-                string(REGEX REPLACE "(^|\n)Libs.private:( *[^\n]*)(.*\nLibs: *[^\n]*)" "\\3\\2" _contents "${_contents}")
-                # Only Libs.private
-                string(REGEX REPLACE "(^|\n)Libs.private: *" "\\1Libs: " _contents "${_contents}")
-                # Requires comes before Requires.private
-                string(REGEX REPLACE "(^|\n)(Requires: *[^\n]*)(.*)\nRequires.private:( *[^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
-                # Requires.private comes before Requires
-                string(REGEX REPLACE "(^|\n)Requires.private:( *[^\n]*)(.*\nRequires: *[^\n]*)" "\\3\\2" _contents "${_contents}")
-                # Only Requires.private
-                string(REGEX REPLACE "(^|\n)Requires.private: *" "\\1Requires: " _contents "${_contents}")
+                foreach(_entry "Libs" "Requires" "Cflags")
+                    # X comes before X.private
+                    string(REGEX REPLACE "(^|\n)(${_entry}: *[^\n]*)(.*)\n${_entry}.private:( *[^\n]*)" "\\1\\2\\4\\3" _contents "${_contents}")
+                    # X.private comes before X
+                    string(REGEX REPLACE "(^|\n)${_entry}.private:( *[^\n]*)(.*\n${_entry}: *[^\n]*)" "\\3\\2" _contents "${_contents}")
+                    # Only X.private
+                    string(REGEX REPLACE "(^|\n)${_entry}.private: *" "\\1${_entry}: " _contents "${_contents}")
+                endforeach()
             endif()
             file(WRITE "${_file}" "prefix=\${pcfiledir}/${RELATIVE_PC_PATH}\n${_contents}")
             unset(PKG_LIB_SEARCH_PATH)
