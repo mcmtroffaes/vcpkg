@@ -1,8 +1,8 @@
 diff --git a/avs_core/CMakeLists.txt b/avs_core/CMakeLists.txt
-index 76e61caa..8461a764 100644
+index 76e61caa..3106cdc1 100644
 --- a/avs_core/CMakeLists.txt
 +++ b/avs_core/CMakeLists.txt
-@@ -97,26 +97,21 @@ if (EXISTS ${GHS_FILESYSTEM_INCLUDE_DIR})
+@@ -97,26 +97,24 @@ if (EXISTS ${GHS_FILESYSTEM_INCLUDE_DIR})
      target_include_directories("AvsCore" SYSTEM PRIVATE ${GHS_FILESYSTEM_INCLUDE_DIR})
  endif()
  
@@ -19,7 +19,7 @@ index 76e61caa..8461a764 100644
  else()
 -    set(SYSLIB "pthread" "dl")
 -    set(SYSLIBS "-lpthread -ldl")
-+    set(SYSLIB "pthread" "dl" "stdc++" "m")
++    set(SYSLIB "pthread" "dl" "m")
  endif()
  
 -# Per-OS link dependencies
@@ -27,9 +27,12 @@ index 76e61caa..8461a764 100644
 -  target_link_libraries("AvsCore" "uuid" "winmm" "vfw32" "msacm32" "gdi32" "user32" "advapi32" "ole32" "imagehlp")
 -else()
 -  target_link_libraries("AvsCore" "${SYSLIB}" "${FSLIB}")
-+# stdc++fs was mainlined into stdc++ in GCC 9, but GCC 8 can build it too
-+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
-+    list(APPEND SYSLIB "stdc++fs")
++if (CMAKE_COMPILER_IS_GNUCXX)
++    list(APPEND SYSLIB "stdc++")
++    # stdc++fs was mainlined into stdc++ in GCC 9, but GCC 8 can build it too
++    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
++        list(APPEND SYSLIB "stdc++fs")
++    endif()
  endif()
  
 +target_link_libraries("AvsCore" ${SYSLIB})
@@ -37,7 +40,7 @@ index 76e61caa..8461a764 100644
  if (MSVC_IDE)
    # Copy output to a common folder for easy deployment
    add_custom_command(
-@@ -165,6 +160,9 @@ endif()
+@@ -165,6 +163,9 @@ endif()
  # Generate pkg-config file
  get_target_property(LIB_NAME AvsCore OUTPUT_NAME)
  set(LIBS "-l${LIB_NAME}")
@@ -47,3 +50,12 @@ index 76e61caa..8461a764 100644
  CONFIGURE_FILE("avisynth.pc.in" "avisynth.pc" @ONLY)
  
  # Generate avisynth.conf
+diff --git a/avs_core/avisynth.pc.in b/avs_core/avisynth.pc.in
+index 6922c996..c5f2bacb 100644
+--- a/avs_core/avisynth.pc.in
++++ b/avs_core/avisynth.pc.in
+@@ -10,3 +10,4 @@ Version: @PROJECT_VERSION@
+ Libs: -L${libdir} @LIBS@
+ Libs.private: -L${libdir} @SYSLIBS@
+ Cflags: -I${includedir}
++Cflags.private: -DAVS_STATIC_LIB
