@@ -3,11 +3,12 @@ vcpkg_fail_port_install(ON_ARCH "arm" "arm64" ON_TARGET "UWP")
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO AviSynth/AviSynthPlus
-    REF v3.7.0
-    SHA512 0f2d5344c4472b810667b99d9e99a2ec8135923f4185dbd7e29ca65e696ce13500ea20ef09c995486573314149a671e1256a4dd0696c4ace8d3ec3716ffdcfc7
+    REF 761907b789932cc93d7ca831a07211c41c758a4d
+    SHA512 c550692720638b0012f382334ee738ede9adc7156e6ee40133816c7f0f1e0cbf042411e3a00a7f2fd717b414211b858d4b637bcc7a8825a81834ebd9440f5614
     HEAD_REF master
     PATCHES
         0001-fix-syslibs.patch
+        0002-fix-pc-include.patch
 )
 
 vcpkg_download_distfile(GHC_ARCHIVE

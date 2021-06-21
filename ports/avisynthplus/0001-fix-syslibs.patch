@@ -1,8 +1,8 @@
 diff --git a/avs_core/CMakeLists.txt b/avs_core/CMakeLists.txt
-index 76e61caa..e4dcd8ce 100644
+index dc5000f6..23abcf8e 100644
 --- a/avs_core/CMakeLists.txt
 +++ b/avs_core/CMakeLists.txt
-@@ -97,26 +97,26 @@ if (EXISTS ${GHS_FILESYSTEM_INCLUDE_DIR})
+@@ -101,31 +101,27 @@ if (EXISTS ${GHS_FILESYSTEM_INCLUDE_DIR})
      target_include_directories("AvsCore" SYSTEM PRIVATE ${GHS_FILESYSTEM_INCLUDE_DIR})
  endif()
  
@@ -14,12 +14,19 @@ index 76e61caa..e4dcd8ce 100644
  if (CMAKE_SYSTEM_NAME STREQUAL "Haiku")
      set(SYSLIB "root")
 -    set(SYSLIBS "-lroot")
+-else()
+-if (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+-    set(SYSLIB "pthread")
+-    set(SYSLIBS "-lpthread")
++elseif (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
++    set(SYSLIB "m" "pthread")
 +elseif(MSVC OR MINGW)
 +    set(SYSLIB "uuid" "winmm" "vfw32" "msacm32" "gdi32" "user32" "advapi32" "ole32" "imagehlp")
  else()
 -    set(SYSLIB "pthread" "dl")
 -    set(SYSLIBS "-lpthread -ldl")
-+    set(SYSLIB "pthread" "dl" "m")
+-endif()
++    set(SYSLIB "m" "pthread" "dl")
  endif()
  
 -# Per-OS link dependencies
@@ -38,11 +45,26 @@ index 76e61caa..e4dcd8ce 100644
  endif()
  
 +target_link_libraries("AvsCore" ${SYSLIB})
-+
- if (MSVC_IDE)
-   # Copy output to a common folder for easy deployment
-   add_custom_command(
-@@ -165,6 +165,9 @@ endif()
+ 
+ if(ENABLE_CUDA)
+   if(${CMAKE_VERSION} VERSION_LESS "3.19.5")
+@@ -136,6 +132,7 @@ if(ENABLE_CUDA)
+       #target_link_libraries ("AvsCore" ${CUDA_LIBRARIES})
+       target_link_libraries ("AvsCore" ${CUDA_cudart_static_LIBRARY})
+       target_compile_definitions("AvsCore" PUBLIC ENABLE_CUDA)
++      list(APPEND SYSLIB "cudart_static")
+     endif()
+   else()
+     # Fixed in 3.19.5: https://gitlab.kitware.com/cmake/cmake/-/issues/21740
+@@ -145,6 +142,7 @@ if(ENABLE_CUDA)
+       target_include_directories("AvsCore" PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
+       target_link_libraries ("AvsCore" CUDA::cudart_static)
+       target_compile_definitions("AvsCore" PUBLIC ENABLE_CUDA)
++      list(APPEND SYSLIB "cudart_static")
+     endif()
+   endif()
+ endif()
+@@ -197,6 +195,9 @@ endif()
  # Generate pkg-config file
  get_target_property(LIB_NAME AvsCore OUTPUT_NAME)
  set(LIBS "-l${LIB_NAME}")
@@ -53,11 +75,14 @@ index 76e61caa..e4dcd8ce 100644
  
  # Generate avisynth.conf
 diff --git a/avs_core/avisynth.pc.in b/avs_core/avisynth.pc.in
-index 6922c996..c5f2bacb 100644
+index 6922c996..becb0e43 100644
 --- a/avs_core/avisynth.pc.in
 +++ b/avs_core/avisynth.pc.in
-@@ -10,3 +10,4 @@ Version: @PROJECT_VERSION@
+@@ -8,5 +8,6 @@ Description: A powerful nonlinear scripting language for video.
+ Version: @PROJECT_VERSION@
+ 
  Libs: -L${libdir} @LIBS@
- Libs.private: -L${libdir} @SYSLIBS@
+-Libs.private: -L${libdir} @SYSLIBS@
++Libs.private: @SYSLIBS@
  Cflags: -I${includedir}
 +Cflags.private: -DAVS_STATIC_LIB
