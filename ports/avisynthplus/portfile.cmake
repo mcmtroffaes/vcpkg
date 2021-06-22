@@ -9,6 +9,7 @@ vcpkg_from_github(
     PATCHES
         0001-fix-syslibs.patch
         0002-fix-pc-include.patch
+        0003-fix-tls-static.patch
 )
 
 vcpkg_download_distfile(GHC_ARCHIVE
