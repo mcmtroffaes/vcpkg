@@ -120,13 +120,6 @@
         {
           "name": "ffmpeg",
           "features": [
-            "tensorflow"
-          ],
-          "platform": "!(x86 | arm | uwp) & !static"
-        },
-        {
-          "name": "ffmpeg",
-          "features": [
             "opengl"
           ],
           "platform": "!uwp & !(windows & arm) & !osx"
