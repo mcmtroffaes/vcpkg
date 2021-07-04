@@ -176,7 +176,7 @@
           "features": [
             "avisynthplus"
           ],
-          "platform": "windows & !arm & !uwp"
+          "platform": "windows & !arm & !uwp & !static"
         }
       ]
     },
