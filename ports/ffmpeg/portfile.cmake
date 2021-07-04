@@ -1,6 +1,6 @@
-if(VCPKG_TARGET_IS_WINDOWS)
-    set(PATCHES 0017-Patch-for-ticket-9019-CUDA-Compile-Broken-Using-MSVC.patch)  # https://trac.ffmpeg.org/ticket/9019
-endif()
+
+
+
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO ffmpeg/ffmpeg
@@ -19,7 +19,6 @@ vcpkg_from_github(
         0012-Fix-ssl-110-detection.patch
         0013-define-WINVER.patch
         0015-Fix-xml2-detection.patch
-        ${PATCHES}
 )
 
 if (SOURCE_PATH MATCHES " ")
