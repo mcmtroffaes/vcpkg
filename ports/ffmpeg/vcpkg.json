@@ -28,6 +28,7 @@
       "dependencies": [
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "avresample",
             "bzip2",
@@ -49,6 +50,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "sdl2"
           ],
@@ -56,6 +58,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "opencl"
           ],
@@ -63,6 +66,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "openh264"
           ],
@@ -70,6 +74,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "xml2"
           ],
@@ -77,6 +82,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "ilbc"
           ],
@@ -84,6 +90,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "ass"
           ],
@@ -91,6 +98,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "fribidi"
           ],
@@ -98,6 +106,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "ssh"
           ],
@@ -105,6 +114,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "dav1d"
           ],
@@ -112,6 +122,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "modplug"
           ],
@@ -119,6 +130,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "opengl"
           ],
@@ -126,6 +138,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "nvcodec"
           ],
@@ -133,6 +146,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "tesseract"
           ],
@@ -140,6 +154,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "fontconfig"
           ],
@@ -152,13 +167,16 @@
       "dependencies": [
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "all",
-            "gpl"
+            "gpl",
+            "postproc"
           ]
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "x264"
           ],
@@ -166,6 +184,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "x265"
           ],
@@ -173,6 +192,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "avisynthplus"
           ],
@@ -185,6 +205,7 @@
       "dependencies": [
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "all-gpl",
             "nonfree",
@@ -193,6 +214,7 @@
         },
         {
           "name": "ffmpeg",
+          "default-features": false,
           "features": [
             "fdk-aac"
           ],
