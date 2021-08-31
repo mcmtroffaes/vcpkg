@@ -1,6 +1,6 @@
 {
   "name": "ffmpeg",
-  "version-string": "2021-08-16",
+  "version-string": "2021-08-30",
   "port-version": 0,
   "description": [
     "a library to decode, encode, transcode, mux, demux, stream, filter and play pretty much anything that humans and machines have created.",
