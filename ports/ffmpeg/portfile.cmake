@@ -19,7 +19,6 @@ vcpkg_from_github(
         0012-Fix-ssl-110-detection.patch
         0013-define-WINVER.patch
         0015-Fix-xml2-detection.patch
-        0018-libaom-Dont-use-aom_codec_av1_dx_algo.patch
         0019-libx264-Do-not-explicitly-set-X264_API_IMPORTS.patch
 )
 
