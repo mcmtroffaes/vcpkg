@@ -165,14 +165,6 @@
           "name": "ffmpeg",
           "default-features": false,
           "features": [
-            "tesseract"
-          ],
-          "platform": "!uwp & !(windows & arm) & !static"
-        },
-        {
-          "name": "ffmpeg",
-          "default-features": false,
-          "features": [
             "fontconfig"
           ],
           "platform": "!(windows & static) & !(uwp | arm)"
