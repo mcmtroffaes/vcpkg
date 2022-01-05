@@ -163,7 +163,7 @@
             "nvcodec"
           ],
           "platform": "(windows | linux) & !uwp"
-        },
+        }
       ]
     },
     "all-gpl": {
