@@ -141,6 +141,10 @@ else()
     set(OPTIONS "${OPTIONS} --disable-ffprobe")
 endif()
 
+if (NOT "alsa" IN_LIST FEATURES)
+    set(OPTIONS "${OPTIONS} --disable-alsa")
+endif()
+
 if("avcodec" IN_LIST FEATURES)
     set(OPTIONS "${OPTIONS} --enable-avcodec")
     set(ENABLE_AVCODEC ON)
