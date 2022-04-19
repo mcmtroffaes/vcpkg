@@ -741,8 +741,14 @@ function(extract_version_from_component out)
     cmake_parse_arguments(PARSE_ARGV 1 "arg" "" "COMPONENT" "")
     string(TOLOWER "${arg_COMPONENT}" component_lower)
     string(TOUPPER "${arg_COMPONENT}" component_upper)
+    file(READ "${SOURCE_PATH}/${component_lower}/version_major.h" contents_major)
+    if (contents_major MATCHES "#define ${component_upper}_VERSION_MAJOR")
+	set(file_major "${SOURCE_PATH}/${component_lower}/version_major.h")
+    else()
+	set(file_major "${SOURCE_PATH}/${component_lower}/version.h")
+    endif()
     extract_regex_from_file(major_version
-        FILE "${SOURCE_PATH}/${component_lower}/version.h"
+        FILE "${file_major}"
         REGEX "#define ${component_upper}_VERSION_MAJOR[ ]+([0-9]+)"
     )
     extract_regex_from_file(minor_version
