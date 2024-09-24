@@ -18,6 +18,7 @@ vcpkg_configure_make(
     SOURCE_PATH "${SOURCE_PATH}"
     AUTOCONFIG
     COPY_SOURCE  # ensure generated files are found
+    ADDITIONAL_MSYS_PACKAGES autoconf-archive
 )
 vcpkg_install_make()
 vcpkg_fixup_pkgconfig()
