@@ -1,6 +1,6 @@
-From 6cc1d20f5eb52d3ab90d095b589b5ab4fc896233 Mon Sep 17 00:00:00 2001
+From 9a6965b119f66bbd0d2b9bae4dcbf90bb7e9727e Mon Sep 17 00:00:00 2001
 From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
-Date: Tue, 24 Sep 2024 15:17:06 +0100
+Date: Tue, 24 Sep 2024 15:49:04 +0100
 Subject: [PATCH] autoconf: check and add C11 support flag.
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH] autoconf: check and add C11 support flag.
  1 file changed, 9 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 86a2ac0..54f0fd7 100644
+index 86a2ac0..5b10d07 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -34,6 +34,15 @@ case $host_os in
@@ -20,7 +20,7 @@ index 86a2ac0..54f0fd7 100644
 +    [AX_APPEND_FLAG([-std=c11])],
 +    [AX_CHECK_COMPILE_FLAG([-std:c11],
 +        [AX_APPEND_FLAG([-std:c11])],
-+	[AC_MSG_ERROR([compiler does not support C11])]
++        [echo "error: compiler does not support C11"; exit -1]
 +    )]
 +)
 +
