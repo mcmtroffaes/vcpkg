@@ -1,0 +1,29 @@
+From 95d43dcb08c14b834341459c132462847ed55441 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Beno=C3=AEt=20Legat?= <benoit.legat@gmail.com>
+Date: Sat, 15 May 2021 11:11:15 -0400
+Subject: [PATCH 1/4] Fix segfault in blockelimination
+
+---
+ lib-src/cddproj.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib-src/cddproj.c b/lib-src/cddproj.c
+index 701cc9d..0a5cdf7 100644
+--- a/lib-src/cddproj.c
++++ b/lib-src/cddproj.c
+@@ -84,6 +84,12 @@ dd_MatrixPtr dd_BlockElimination(dd_MatrixPtr M, dd_colset delset, dd_ErrorType
+   /* 2. Compute the generators of the dual system. */
+   dualpoly=dd_DDMatrix2Poly(Mdual, &err);
+   Gdual=dd_CopyGenerators(dualpoly);
++  /* If `dualpoly->child->CompStatus != ddf_AllFound`, then
++   * `CopyGenerators` return `NULL` so we return `NULL` as well.
++   * `DDMatrix2Poly` should have set `err` to the appropriate value.
++   */
++  if (NULL == Gdual)
++      return NULL;
+ 
+   /* 3. Take the linear combination of the original system with each generator.  */
+   dproj=d-delsize;
+-- 
+2.21.0.windows.1
+

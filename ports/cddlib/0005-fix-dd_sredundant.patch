@@ -1,0 +1,50 @@
+From 732e3c00b31b55d132b86771fbcc07997be8bc5e Mon Sep 17 00:00:00 2001
+From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
+Date: Thu, 19 Sep 2024 13:52:21 +0100
+Subject: [PATCH 5/6] Copy certificate and handle errors correctly in
+ dd_SRedunant in V_SReduncancy code path.
+
+---
+ lib-src/cddlp.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/lib-src/cddlp.c b/lib-src/cddlp.c
+index 3f59593..f58a2b8 100644
+--- a/lib-src/cddlp.c
++++ b/lib-src/cddlp.c
+@@ -2798,17 +2798,25 @@ dd_boolean dd_SRedundant(dd_MatrixPtr M, dd_rowrange itest, dd_Arow certificate,
+           dd_FreeLPSolution(lps);
+           lp=dd_CreateLP_V_SRedundancy(M, itest);
+           dd_LPSolve(lp,dd_DualSimplex,&err);
+-          lps=dd_CopyLPSolution(lp);
+           if (localdebug) dd_WriteLPResult(stdout,lp,err);
+-          if (dd_Positive(lps->optvalue)){
+-            answer=dd_FALSE;
+-            if (localdebug) fprintf(stderr,"==> %ld th point is not strongly redundant.\n",itest);
++          if (err!=dd_NoError){
++            *error=err;
++            goto _L999;
+           } else {
+-            answer=dd_TRUE;
+-            if (localdebug) fprintf(stderr,"==> %ld th point is strongly redundant.\n",itest);
++            lps=dd_CopyLPSolution(lp);
++            for (j=0; j<lps->d; j++) {
++              dd_set(certificate[j], lps->sol[j]);
++            }
++            if (dd_Positive(lps->optvalue)){
++              answer=dd_FALSE;
++              if (localdebug) fprintf(stderr,"==> %ld th point is not strongly redundant.\n",itest);
++            } else {
++              answer=dd_TRUE;
++              if (localdebug) fprintf(stderr,"==> %ld th point is strongly redundant.\n",itest);
++            }
+           }
+        }
+-    } 
++    }
+     dd_FreeLPSolution(lps);
+   }
+   _L999:
+-- 
+2.21.0.windows.1
+
