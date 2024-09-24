@@ -1,18 +1,18 @@
-From 604af8c673e1e2d7733b896ce9a5c2a0192aad53 Mon Sep 17 00:00:00 2001
+From aafccbf87c557640d7c4f7d1fd15f12e93b2548f Mon Sep 17 00:00:00 2001
 From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
 Date: Tue, 24 Sep 2024 19:40:01 +0100
 Subject: [PATCH] Fix potential dd_MatrixCanonicalize segfault.
 
 Error could result in freeing of uninitialized pointer.
 ---
- lib-src/cddlp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ lib-src/cddlp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/lib-src/cddlp.c b/lib-src/cddlp.c
-index 3f59593..f55f768 100644
+index 3f59593..09ef63e 100644
 --- a/lib-src/cddlp.c
 +++ b/lib-src/cddlp.c
-@@ -3343,12 +3343,13 @@ dd_rowindex *newpos, dd_ErrorType *error) /* 094 */
+@@ -3343,8 +3343,8 @@ dd_rowindex *newpos, dd_ErrorType *error) /* 094 */
     redundancies will be returned by *redset.
  */
    dd_rowrange i,k,m;
@@ -23,11 +23,6 @@ index 3f59593..f55f768 100644
    dd_boolean success=dd_TRUE;
    
    m=(*M)->rowsize;
-   set_initialize(redset, m);
-+  *error=dd_NoError;
-   revpos=(long *)calloc(m+1,sizeof(long));
-   
-   success=dd_MatrixCanonicalizeLinearity(M, impl_linset, newpos, error);
 -- 
 2.46.0
 
