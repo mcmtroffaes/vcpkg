@@ -1,0 +1,95 @@
+From 9c14157f2402f7eab227547d5d9d213d4e8801da Mon Sep 17 00:00:00 2001
+From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
+Date: Tue, 24 Sep 2024 11:40:40 +0100
+Subject: [PATCH 5/6] Generate different pc files for cdd and cddgmp to get
+ correct linkage.
+
+---
+ .gitignore   |  1 +
+ Makefile.am  |  3 +++
+ cddgmp.pc.in | 10 ++++++++++
+ cddlib.pc.in |  6 +++---
+ configure.ac |  4 +---
+ 5 files changed, 18 insertions(+), 6 deletions(-)
+ create mode 100644 cddgmp.pc.in
+
+diff --git a/.gitignore b/.gitignore
+index 2f9cc2a..20f48f5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,6 +2,7 @@
+ # http://www.gnu.org/software/automake
+ 
+ cddlib.pc
++cddgmp.pc
+ Makefile.in
+ /ar-lib
+ /mdate-sh
+diff --git a/Makefile.am b/Makefile.am
+index e08cd91..51e5fd5 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -15,3 +15,6 @@ distcheck-hook:
+ 
+ pkgconfigdir       = $(libdir)/pkgconfig
+ pkgconfig_DATA     = cddlib.pc
++if GMP
++pkgconfig_DATA    += cddgmp.pc
++endif
+diff --git a/cddgmp.pc.in b/cddgmp.pc.in
+new file mode 100644
+index 0000000..b901827
+--- /dev/null
++++ b/cddgmp.pc.in
+@@ -0,0 +1,10 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: @PACKAGE_NAME@
++Description: C library implementing Double Description Method (generating vertices, etc. of polyhedra) using GMP rationals
++Version: @PACKAGE_VERSION@
++Libs: @CDD_LDFLAGS@ -L${libdir} -lcddgmp -lgmp
++Cflags: -I${includedir} -DGMPRATIONAL
+diff --git a/cddlib.pc.in b/cddlib.pc.in
+index 499b949..ae4eef6 100644
+--- a/cddlib.pc.in
++++ b/cddlib.pc.in
+@@ -1,10 +1,10 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ libdir=@libdir@
+-includedir=@prefix@/include
++includedir=@includedir@
+ 
+ Name: @PACKAGE_NAME@
+ Description: C library implementing Double Description Method (generating vertices, etc. of polyhedra)
+ Version: @PACKAGE_VERSION@
+-Libs: @CDD_LDFLAGS@ -L${libdir} @CDD_LIBS@
+-Cflags: -I${includedir}
++Libs: @CDD_LDFLAGS@ -L${libdir} -lcdd
++Cflags: -I${includedir} -UGMPRATIONAL
+diff --git a/configure.ac b/configure.ac
+index 86a2ac0..0c2adb1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -42,8 +42,6 @@ AC_CHECK_HEADER(gmp.h, [
+ 
+ dnl We do not build the gmp enabled library if we don't have gmp.
+ AM_CONDITIONAL([GMP], [test "x$ac_cv_lib_gmp___gmpz_init" = "xyes"])
+-AS_IF([test "x$ac_cv_lib_gmp___gmpz_init" = "xyes"], [CDD_LIBS="-lcdd -lcddgmp"], [CDD_LIBS="-lcdd"])
+-AC_SUBST(CDD_LIBS)
+ 
+ dnl Check for latex to build the documentation dvi
+ AC_CHECK_PROGS([latex], [latex])
+@@ -61,5 +59,5 @@ dnl Check for dvips to build the documentation ps
+ AC_CHECK_PROGS([dvips], [dvips])
+ AM_CONDITIONAL([PS], [test "x$ac_cv_prog_dvips" != "x"])
+ 
+-AC_CONFIG_FILES([doc/Makefile lib-src/Makefile src/Makefile Makefile cddlib.pc])
++AC_CONFIG_FILES([doc/Makefile lib-src/Makefile src/Makefile Makefile cddlib.pc cddgmp.pc])
+ AC_OUTPUT
+-- 
+2.21.0.windows.1
+

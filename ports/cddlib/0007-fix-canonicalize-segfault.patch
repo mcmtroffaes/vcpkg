@@ -1,0 +1,28 @@
+From aafccbf87c557640d7c4f7d1fd15f12e93b2548f Mon Sep 17 00:00:00 2001
+From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
+Date: Tue, 24 Sep 2024 19:40:01 +0100
+Subject: [PATCH] Fix potential dd_MatrixCanonicalize segfault.
+
+Error could result in freeing of uninitialized pointer.
+---
+ lib-src/cddlp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib-src/cddlp.c b/lib-src/cddlp.c
+index 3f59593..09ef63e 100644
+--- a/lib-src/cddlp.c
++++ b/lib-src/cddlp.c
+@@ -3343,8 +3343,8 @@ dd_rowindex *newpos, dd_ErrorType *error) /* 094 */
+    redundancies will be returned by *redset.
+ */
+   dd_rowrange i,k,m;
+-  dd_rowindex newpos1,revpos;
+-  dd_rowset redset1;
++  dd_rowindex newpos1=NULL,revpos=NULL;
++  dd_rowset redset1=NULL;
+   dd_boolean success=dd_TRUE;
+   
+   m=(*M)->rowsize;
+-- 
+2.46.0
+
