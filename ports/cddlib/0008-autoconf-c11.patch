@@ -1,28 +1,26 @@
-From 9a6965b119f66bbd0d2b9bae4dcbf90bb7e9727e Mon Sep 17 00:00:00 2001
+From 43b5b15aaba3615f71c84acaab6f48220336f329 Mon Sep 17 00:00:00 2001
 From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
 Date: Tue, 24 Sep 2024 15:49:04 +0100
 Subject: [PATCH] autoconf: check and add C11 support flag.
 
 ---
- configure.ac | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ configure.ac | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 86a2ac0..5b10d07 100644
+index 86a2ac0..288839f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -34,6 +34,15 @@ case $host_os in
+@@ -34,6 +34,13 @@ case $host_os in
  ;;
  esac
  
-+dnl Check for c11 support
-+AX_CHECK_COMPILE_FLAG([-std=c11],
-+    [AX_APPEND_FLAG([-std=c11])],
-+    [AX_CHECK_COMPILE_FLAG([-std:c11],
-+        [AX_APPEND_FLAG([-std:c11])],
-+        [echo "error: compiler does not support C11"; exit -1]
-+    )]
-+)
++dnl Add -std:c11 flag for MSVC
++case $host_os in
++    *cygwin*|*mingw*)
++    AX_CHECK_COMPILE_FLAG([-std:c11], [AX_APPEND_FLAG([-std:c11])])
++;;
++esac
 +
  dnl Look for gmp. But do not prepend -lgmp to LIBS as we do not want to link everything against gmp.
  dnl Check for GMP headers and library
