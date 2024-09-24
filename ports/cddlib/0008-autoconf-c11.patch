@@ -1,0 +1,32 @@
+From 6cc1d20f5eb52d3ab90d095b589b5ab4fc896233 Mon Sep 17 00:00:00 2001
+From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
+Date: Tue, 24 Sep 2024 15:17:06 +0100
+Subject: [PATCH] autoconf: check and add C11 support flag.
+
+---
+ configure.ac | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 86a2ac0..54f0fd7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -34,6 +34,15 @@ case $host_os in
+ ;;
+ esac
+ 
++dnl Check for c11 support
++AX_CHECK_COMPILE_FLAG([-std=c11],
++    [AX_APPEND_FLAG([-std=c11])],
++    [AX_CHECK_COMPILE_FLAG([-std:c11],
++        [AX_APPEND_FLAG([-std:c11])],
++	[AC_MSG_ERROR([compiler does not support C11])]
++    )]
++)
++
+ dnl Look for gmp. But do not prepend -lgmp to LIBS as we do not want to link everything against gmp.
+ dnl Check for GMP headers and library
+ AC_CHECK_HEADER(gmp.h, [
+-- 
+2.46.0
+

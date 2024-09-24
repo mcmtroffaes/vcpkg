@@ -12,6 +12,7 @@ vcpkg_from_github(
         0005-fix-dd_sredundant.patch
         0006-fix-pkg-config.patch
         0007-fix-canonicalize-segfault.patch
+        0008-autoconf-c11.patch
 )
 vcpkg_configure_make(
     SOURCE_PATH "${SOURCE_PATH}"
