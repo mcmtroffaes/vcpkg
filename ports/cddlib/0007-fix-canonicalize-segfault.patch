@@ -1,18 +1,18 @@
-From 721be0a7e99c77636a7d8c489f0bc33b7bed3aad Mon Sep 17 00:00:00 2001
+From 604af8c673e1e2d7733b896ce9a5c2a0192aad53 Mon Sep 17 00:00:00 2001
 From: "Matthias C. M. Troffaes" <matthias.troffaes@gmail.com>
-Date: Tue, 24 Sep 2024 13:56:03 +0100
-Subject: [PATCH] Fix dd_MatrixCanonicalize segfault (error could result in
- freeing of uninitialized pointer).
+Date: Tue, 24 Sep 2024 19:40:01 +0100
+Subject: [PATCH] Fix potential dd_MatrixCanonicalize segfault.
 
+Error could result in freeing of uninitialized pointer.
 ---
- lib-src/cddlp.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ lib-src/cddlp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/lib-src/cddlp.c b/lib-src/cddlp.c
-index 3f59593..71a6252 100644
+index 3f59593..f55f768 100644
 --- a/lib-src/cddlp.c
 +++ b/lib-src/cddlp.c
-@@ -3343,17 +3343,18 @@ dd_rowindex *newpos, dd_ErrorType *error) /* 094 */
+@@ -3343,12 +3343,13 @@ dd_rowindex *newpos, dd_ErrorType *error) /* 094 */
     redundancies will be returned by *redset.
  */
    dd_rowrange i,k,m;
@@ -28,21 +28,6 @@ index 3f59593..71a6252 100644
    revpos=(long *)calloc(m+1,sizeof(long));
    
    success=dd_MatrixCanonicalizeLinearity(M, impl_linset, newpos, error);
- 
--  if (!success) goto _L99;  
-+  if (!success || *error != dd_NoError) goto _L99;  
-   
-   for (i=1; i<=m; i++){
-     k=(*newpos)[i];
-@@ -3362,7 +3363,7 @@ dd_rowindex *newpos, dd_ErrorType *error) /* 094 */
-  
-   success=dd_MatrixRedundancyRemove(M, &redset1, &newpos1, error);  /* 094 */
-   
--  if (!success) goto _L99;
-+  if (!success || *error != dd_NoError) goto _L99;  
- 
-   for (i=1; i<=m; i++){
-     k=(*newpos)[i];
 -- 
 2.46.0
 
