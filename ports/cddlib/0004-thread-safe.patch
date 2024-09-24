@@ -1,0 +1,211 @@
+From 1210faf9ee9cf02e29fc67e11a8ea4e847c58ddd Mon Sep 17 00:00:00 2001
+From: Dima Pasechnik <dima@pasechnik.info>
+Date: Tue, 18 Oct 2022 11:25:52 +0100
+Subject: [PATCH 2/4] make cddlib thread-safe using C11's _Thread_local
+
+I tested it linking cddlib with topcom 1.1.2, and running
+
+points2nalltriangs -i examples/cube_4.dat --regular \
+  --affinesymmetries --parallelenumeration --workbuffercontrol
+
+in topcom's main directory. To link with external cddlib,
+topcom 1.1.2 needs a patch, as provided by
+https://trac.sagemath.org/ticket/31531
+---
+ lib-src/cddcore.c    | 12 ++++++------
+ lib-src/cddio.c      |  8 ++++----
+ lib-src/cddlib.c     |  4 ++--
+ lib-src/cddlp.c      | 36 ++++++++++++++++++------------------
+ lib-src/setoper.c    |  2 +-
+ lib-src/splitmix64.h |  2 +-
+ 6 files changed, 32 insertions(+), 32 deletions(-)
+
+diff --git a/lib-src/cddcore.c b/lib-src/cddcore.c
+index 2bffea5..2f71f89 100644
+--- a/lib-src/cddcore.c
++++ b/lib-src/cddcore.c
+@@ -23,8 +23,8 @@ void dd_CheckAdjacency(dd_ConePtr cone,
+ {
+   dd_RayPtr TempRay;
+   dd_boolean localdebug=dd_FALSE;
+-  static dd_rowset Face, Face1;
+-  static dd_rowrange last_m=0;
++  static _Thread_local dd_rowset Face, Face1;
++  static _Thread_local dd_rowrange last_m=0;
+   
+   if (last_m!=cone->m) {
+     if (last_m>0){
+@@ -291,8 +291,8 @@ void dd_ConditionalAddEdge(dd_ConePtr cone,
+   dd_AdjacencyType *NewEdge;
+   dd_boolean localdebug=dd_FALSE;
+   dd_rowset ZSmin, ZSmax;
+-  static dd_rowset Face, Face1;
+-  static dd_rowrange last_m=0;
++  static _Thread_local dd_rowset Face, Face1;
++  static _Thread_local dd_rowrange last_m=0;
+   
+   if (last_m!=cone->m) {
+     if (last_m>0){
+@@ -1084,8 +1084,8 @@ void dd_CreateNewRay(dd_ConePtr cone,
+   /*Create a new ray by taking a linear combination of two rays*/
+   dd_colrange j;
+   mytype a1, a2, v1, v2;
+-  static dd_Arow NewRay;
+-  static dd_colrange last_d=0;
++  static _Thread_local dd_Arow NewRay;
++  static _Thread_local dd_colrange last_d=0;
+   dd_boolean localdebug=dd_debug;
+ 
+   dd_init(a1); dd_init(a2); dd_init(v1); dd_init(v2);
+diff --git a/lib-src/cddio.c b/lib-src/cddio.c
+index 8a5e509..75d27ea 100644
+--- a/lib-src/cddio.c
++++ b/lib-src/cddio.c
+@@ -1080,8 +1080,8 @@ void dd_CopyRay(mytype *a, dd_colrange d_origsize, dd_RayPtr RR,
+ void dd_WriteRay(FILE *f, dd_colrange d_origsize, dd_RayPtr RR, dd_RepresentationType rep, dd_colindex reducedcol)
+ {
+   dd_colrange j;
+-  static dd_colrange d_last=0;
+-  static dd_Arow a;
++  static _Thread_local dd_colrange d_last=0;
++  static _Thread_local dd_Arow a;
+ 
+   if (d_last< d_origsize){
+     if (d_last>0) free(a);
+@@ -1405,8 +1405,8 @@ dd_boolean dd_InputAdjacentQ(dd_PolyhedraPtr poly,
+ {
+   dd_boolean adj=dd_TRUE;
+   dd_rowrange i;
+-  static set_type common;
+-  static long lastn=0;
++  static _Thread_local set_type common;
++  static _Thread_local long lastn=0;
+ 
+   if (poly->AincGenerated==dd_FALSE) dd_ComputeAinc(poly);
+   if (lastn!=poly->n){
+diff --git a/lib-src/cddlib.c b/lib-src/cddlib.c
+index 4af516e..8315dca 100644
+--- a/lib-src/cddlib.c
++++ b/lib-src/cddlib.c
+@@ -144,8 +144,8 @@ void dd_InitialDataSetup(dd_ConePtr cone)
+ {
+   long j, r;
+   dd_rowset ZSet;
+-  static dd_Arow Vector1,Vector2;
+-  static dd_colrange last_d=0;
++  static _Thread_local dd_Arow Vector1,Vector2;
++  static _Thread_local dd_colrange last_d=0;
+ 
+   if (last_d < cone->d){
+     if (last_d>0) {
+diff --git a/lib-src/cddlp.c b/lib-src/cddlp.c
+index 4572a0a..3f59593 100644
+--- a/lib-src/cddlp.c
++++ b/lib-src/cddlp.c
+@@ -539,9 +539,9 @@ void dd_SelectDualSimplexPivot(dd_rowrange m_size,dd_colrange d_size,
+   dd_rowrange i,iref;
+   dd_colrange j,k;
+   mytype val,valn, minval,rat,minrat;
+-  static dd_Arow rcost;
+-  static dd_colrange d_last=0;
+-  static dd_colset tieset,stieset;  /* store the column indices with tie */
++  static _Thread_local dd_Arow rcost;
++  static _Thread_local dd_colrange d_last=0;
++  static _Thread_local dd_colset tieset,stieset;  /* store the column indices with tie */
+ 
+   dd_init(val); dd_init(valn); dd_init(minval); dd_init(rat); dd_init(minrat);
+   if (d_last<d_size) {
+@@ -750,8 +750,8 @@ void dd_GaussianColumnPivot(dd_rowrange m_size, dd_colrange d_size,
+ {
+   dd_colrange j, j1;
+   mytype Xtemp0, Xtemp1, Xtemp;
+-  static dd_Arow Rtemp;
+-  static dd_colrange last_d=0;
++  static _Thread_local dd_Arow Rtemp;
++  static _Thread_local dd_colrange last_d=0;
+ 
+   dd_init(Xtemp0); dd_init(Xtemp1); dd_init(Xtemp);
+   if (last_d!=d_size){
+@@ -1180,9 +1180,9 @@ void dd_FindDualFeasibleBasis(dd_rowrange m_size,dd_colrange d_size,
+   dd_rowrange i,r_val;
+   dd_colrange j,l,ms=0,s_val,local_m_size;
+   mytype x,val,maxcost,axvalue,maxratio;
+-  static dd_colrange d_last=0;
+-  static dd_Arow rcost;
+-  static dd_colindex nbindex_ref; /* to be used to store the initial feasible basis for lexico rule */
++  static _Thread_local dd_colrange d_last=0;
++  static _Thread_local dd_Arow rcost;
++  static _Thread_local dd_colindex nbindex_ref; /* to be used to store the initial feasible basis for lexico rule */
+ 
+   mytype scaling,svalue;  /* random scaling mytype value */
+   mytype minval;
+@@ -1411,10 +1411,10 @@ When LP is dual-inconsistent then lp->se returns the evidence column.
+ 
+   dd_rowrange i,r;
+   dd_colrange j,s;
+-  static dd_rowindex bflag;
+-  static long mlast=0,nlast=0;
+-  static dd_rowindex OrderVector;  /* the permutation vector to store a preordered row indeces */
+-  static dd_colindex nbindex_ref; /* to be used to store the initial feasible basis for lexico rule */
++  static _Thread_local dd_rowindex bflag;
++  static _Thread_local long mlast=0,nlast=0;
++  static _Thread_local dd_rowindex OrderVector;  /* the permutation vector to store a preordered row indeces */
++  static _Thread_local dd_colindex nbindex_ref; /* to be used to store the initial feasible basis for lexico rule */
+ 
+   double redpercent=0,redpercent_prev=0,redgain=0;
+   unsigned int rseed=1;
+@@ -1593,9 +1593,9 @@ When LP is dual-inconsistent then lp->se returns the evidence column.
+ 
+   dd_rowrange i,r;
+   dd_colrange s;
+-  static dd_rowindex bflag;
+-  static long mlast=0;
+-  static dd_rowindex OrderVector;  /* the permutation vector to store a preordered row indeces */
++  static _Thread_local dd_rowindex bflag;
++  static _Thread_local long mlast=0;
++  static _Thread_local dd_rowindex OrderVector;  /* the permutation vector to store a preordered row indeces */
+   unsigned int rseed=1;
+   dd_colindex nbtemp;
+ 
+@@ -3595,9 +3595,9 @@ arithmetics.
+   long pivots0,pivots1,fbasisrank;
+   dd_rowrange i,is;
+   dd_colrange s,senew,j;
+-  static dd_rowindex bflag;
+-  static long mlast=0;
+-  static dd_rowindex OrderVector;  /* the permutation vector to store a preordered row indices */
++  static _Thread_local dd_rowindex bflag;
++  static _Thread_local long mlast=0;
++  static _Thread_local dd_rowindex OrderVector;  /* the permutation vector to store a preordered row indices */
+   unsigned int rseed=1;
+   mytype val;
+   dd_colindex nbtemp;
+diff --git a/lib-src/setoper.c b/lib-src/setoper.c
+index 06f4ee5..d537c2f 100644
+--- a/lib-src/setoper.c
++++ b/lib-src/setoper.c
+@@ -23,7 +23,7 @@
+ 
+ #define LUTBLOCKS(set) (((set[0]-1)/SETBITS+1)*(sizeof(long)/sizeof(set_card_lut_t)))
+ 
+-static unsigned char set_card_lut[]={
++static _Thread_local unsigned char set_card_lut[]={
+ 0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+ 1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+ 1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+diff --git a/lib-src/splitmix64.h b/lib-src/splitmix64.h
+index db3b729..92c4e75 100644
+--- a/lib-src/splitmix64.h
++++ b/lib-src/splitmix64.h
+@@ -11,7 +11,7 @@
+ 
+ #include <stdint.h>
+ 
+-static uint64_t x; /* The state can be seeded with any value. */
++static _Thread_local uint64_t x; /* The state can be seeded with any value. */
+ 
+ static void srand_splitmix64(uint64_t seed) {
+ 	x = seed;
+-- 
+2.21.0.windows.1
+

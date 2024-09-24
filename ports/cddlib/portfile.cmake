@@ -7,6 +7,11 @@ vcpkg_from_github(
     PATCHES
         0001-disable-doc-target.patch  # disable building docs, as they require latex
         0002-disable-dd-log.patch  # windows does not export global variables
+        0003-Fix-segfault-in-blockelimination.patch
+        0004-thread-safe.patch
+        0005-fix-dd_sredundant.patch
+        0006-fix-pkg-config.patch
+        0007-fix-canonicalize-segfault.patch
 )
 vcpkg_configure_make(
     SOURCE_PATH "${SOURCE_PATH}"
