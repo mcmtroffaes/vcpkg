@@ -6,14 +6,13 @@ vcpkg_from_github(
     HEAD_REF master
     PATCHES
         0001-disable-doc-target.patch  # disable building docs, as they require latex
-        0002-disable-dd-log.patch  # windows does not export global variables
-        0003-Fix-segfault-in-blockelimination.patch
-        0004-thread-safe.patch
-        0005-fix-dd_sredundant.patch
-        0006-fix-pkg-config.patch
-        0007-fix-canonicalize-segfault.patch
-        0007-fix-canonicalize-segfault-2.patch
-        0008-autoconf-c11.patch
+        0002-disable-dd-log.patch  # https://github.com/cddlib/cddlib/issues/72
+        0003-Fix-segfault-in-blockelimination.patch  # https://github.com/cddlib/cddlib/commit/95d43dcb08c14b834341459c132462847ed55441
+        0004-thread-safe.patch  # https://github.com/cddlib/cddlib/commit/1210faf9ee9cf02e29fc67e11a8ea4e847c58ddd
+        0005-fix-dd_sredundant.patch  # https://github.com/cddlib/cddlib/pull/73
+        0006-fix-pkg-config.patch  # https://github.com/cddlib/cddlib/pull/75
+        0007-fix-canonicalize-segfault.patch  # https://github.com/cddlib/cddlib/pull/77
+        0008-autoconf-c11.patch  # https://github.com/cddlib/cddlib/pull/76
 )
 vcpkg_configure_make(
     SOURCE_PATH "${SOURCE_PATH}"
